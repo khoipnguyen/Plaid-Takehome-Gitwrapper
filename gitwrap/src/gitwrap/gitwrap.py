@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import git
 import os
 import typer
@@ -19,6 +18,10 @@ def get_repo():
     except git.exc.InvalidGitRepositoryError:
         typer.echo("Not a git repository.")
         return None
+
+def yaml_dump(yaml_output):
+    """Dump the YAML output with custom indentation."""
+    typer.echo(yaml.dump(yaml_output, Dumper=IndentDumper, sort_keys=False))
 
 @app.command()
 def clean(dry_run: bool = False, yes: bool = False):
@@ -44,7 +47,7 @@ def clean(dry_run: bool = False, yes: bool = False):
         "files": untracked_files
     }
 
-    typer.echo(yaml.dump(yaml_output, Dumper=IndentDumper, sort_keys=False))
+    yaml_dump(yaml_output)
     return
 
 @app.command()
@@ -72,7 +75,7 @@ def status(dry_run: bool = False):
     if untracked_files:
         yaml_output["untracked_files"] = untracked_files
     
-    typer.echo(yaml.dump(yaml_output, Dumper=IndentDumper, sort_keys=False))
+    yaml_dump(yaml_output)
     return
 
 if __name__ == "__main__":
