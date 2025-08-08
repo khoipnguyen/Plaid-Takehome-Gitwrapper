@@ -1,0 +1,1 @@
+# src/mycli/__init__.py

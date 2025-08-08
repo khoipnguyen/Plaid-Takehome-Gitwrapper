@@ -1,0 +1,9 @@
+[project]
+name = "gitwrap"
+version = "0.1.0"
+description = "A CLI wrapper for Git"
+authors = [{ name = "Khoi Nguyen" }]
+dependencies = ["typer[all]", "GitPython", "pyyaml"]
+
+[project.scripts]
+mycli = "gitwrap.main:app"

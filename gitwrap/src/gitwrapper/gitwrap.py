@@ -1,7 +1,14 @@
+#!/usr/bin/env python3
+
 import git
 import os
 import typer
-from typing_extensions import Annotated
+import yaml
+
+# Custom class to handle YAML indentation
+class IndentDumper(yaml.Dumper):
+    def increase_indent(self, flow=False, indentless=False):
+        return super().increase_indent(flow, False)
 
 app = typer.Typer()
 
@@ -30,36 +37,43 @@ def clean(dry_run: bool = False, yes: bool = False):
         if not yes and not typer.confirm(f"This will delete {len(untracked_files)} untracked files. Continue? [y/N]:"):
             return
         repo.git.clean(f=True, d=True)
-        
-    typer.echo(f"dry_run: {dry_run}\naction: clean\nfiles:")
-    for file in untracked_files:
-        typer.echo(f"  - {file}")
+    
+    yaml_output = {
+        "dry_run": dry_run,
+        "action": "clean",
+        "files": untracked_files
+    }
 
+    typer.echo(yaml.dump(yaml_output, Dumper=IndentDumper, sort_keys=False))
     return
 
 @app.command()
 def status(dry_run: bool = False):
+    """Show the status of the repository in YAML format."""
     repo = get_repo()
     if not repo:
         return
 
-    typer.echo(f"action: status\nbranch: {repo.active_branch.name}\n")
+    yaml_output = {
+        "action": "status",
+        "branch": repo.active_branch.name
+    }
 
-    unstaged_files = repo.index.diff(repo.head.commit)
-    staged_files = [diff.a_path for diff in unstaged_files]
+    staged_files = [diff.a_path for diff in repo.index.diff(repo.head.commit)]
+    unstaged_files = [unstaged.a_path for unstaged in repo.index.diff(None)]
     untracked_files = repo.untracked_files
     
-    typer.echo("staged_files:")
-    for staged in staged_files:
-        typer.echo(f"  - {staged}")
+    if staged_files:
+        yaml_output["staged_files"] = staged_files
     
-    typer.echo("unstaged_files:")
-    for unstaged in unstaged_files:
-        typer.echo(f"  - {unstaged.a_path}")
+    if unstaged_files:
+        yaml_output["unstaged_files"] = unstaged_files
     
-    typer.echo("untracked_files:")
-    for untracked in untracked_files:
-        typer.echo(f"  - {untracked}")
+    if untracked_files:
+        yaml_output["untracked_files"] = untracked_files
+    
+    typer.echo(yaml.dump(yaml_output, Dumper=IndentDumper, sort_keys=False))
+    return
 
 if __name__ == "__main__":
     app()
