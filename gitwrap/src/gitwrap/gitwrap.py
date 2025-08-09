@@ -62,7 +62,7 @@ def status(dry_run: bool = False):
 
     status_result = git_status(repo)
     if not status_result.success:
-        response.status_message = result.message
+        response.status_message = status_result.message
         response.status = GitWrapStatus.FAILURE
         typer.echo(response.status_message)
         return response
@@ -80,7 +80,7 @@ def status(dry_run: bool = False):
     
     response.status = GitWrapStatus.SUCCESS
     response.yaml_output = yaml_dump(yaml_output)
-    response.status_message = "Status operation completed."
+    response.status_message = "Status operation completed successfully."
     typer.echo(response.yaml_output)
     return response
 
