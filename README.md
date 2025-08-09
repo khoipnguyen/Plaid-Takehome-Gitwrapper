@@ -19,3 +19,20 @@ You can install `gitwrap` in editable/development mode. From the root gitwrap di
 
 ```bash
 pip install -e .
+```
+---
+## Usage
+
+```bash
+# Preview files to be deleted
+gitwrap clean --dry-run
+
+# Delete untracked files with confirmation
+gitwrap clean
+
+# Delete untracked files without confirmation
+gitwrap clean --yes
+
+# See repo status including branch name, staged changes, unstaged changes, and untracked files
+gitwrap status
+```
