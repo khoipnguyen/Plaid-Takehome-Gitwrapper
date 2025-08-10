@@ -26,12 +26,22 @@ def git_status(repo: git.Repo):
     result = GitStatusResult(success = False, message = "", staged_files = [], unstaged_files = [], untracked_files = [])
     
     try:
-        result.staged_files = [diff.a_path for diff in repo.index.diff(repo.head.commit)]
-        result.unstaged_files = [unstaged.a_path for unstaged in repo.index.diff(None)]
-        result.untracked_files = get_untracked_files(repo)
-        result.success = True
-        result.message = "Status operation completed successfully."
-        return result
-    except Exception as e:
+        status = repo.git.status('--porcelain=v1', '--untracked-files=all').splitlines()
+    except git.exc.GitCommandError as e:
         result.message = f"Failed to retrieve status: {e}."
         return result
+
+    for line in status:
+        status_code = line[:2]
+        filepath = line[3:]
+
+        if status_code[0] == 'M':
+            result.staged_files.append(filepath)
+        if status_code[1] == 'M':
+            result.unstaged_files.append(filepath)
+        if status_code == '??':
+            result.untracked_files.append(filepath)
+
+    result.success = True
+    result.message = "Status operation completed successfully."
+    return result
