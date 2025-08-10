@@ -5,7 +5,7 @@ from .models import GitWrapResponse, GitWrapStatus
 from .git_utils import get_repo, get_untracked_files, git_clean, git_status
 from .yaml_utils import yaml_dump
 
-app = typer.Typer()
+app = typer.Typer(help = "CLI tool to manage git repositories with YAML output.")
 
 @app.command()
 def clean(dry_run: bool = False, yes: bool = False):
