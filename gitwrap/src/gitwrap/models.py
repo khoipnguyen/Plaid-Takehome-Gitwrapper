@@ -8,6 +8,13 @@ class GitWrapStatus(Enum):
     FAILURE = "failure"
     NO_ACTION = "no_action"
 
+class ResponseMessage(Enum):
+    """Enum for response messages"""
+    NO_REPO = "No git repository found."
+    NO_UNTRACKED_FILES = "No untracked files found."
+    OPERATION_CANCELLED = "Operation cancelled by user."
+    SUCCESS = "Operation completed successfully."
+
 @dataclass
 class GitWrapResponse:
     """Dataclass for gitwrap responses."""

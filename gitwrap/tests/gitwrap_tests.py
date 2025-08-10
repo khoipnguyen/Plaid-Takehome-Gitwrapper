@@ -1,5 +1,6 @@
 import git
 import gitwrap
+from gitwrap.models import ResponseMessage
 import unittest
 from unittest.mock import patch, MagicMock
 import yaml
@@ -25,9 +26,9 @@ class TestGitWrap(unittest.TestCase):
     @patch("gitwrap.gitwrap.typer.echo")
     def test_clean_no_repo(self, mock_echo, mock_get_repo):
         result = gitwrap.clean()
-        mock_echo.assert_called_with("No git repository found.")
+        mock_echo.assert_called_with(ResponseMessage.NO_REPO.value)
         self.assertEqual(result.status, gitwrap.gitwrap.GitWrapStatus.FAILURE)
-        self.assertIn("No git repository found", result.status_message)
+        self.assertEqual(ResponseMessage.NO_REPO.value, result.status_message)
     
     @patch("gitwrap.gitwrap.get_untracked_files", return_value=[])
     @patch("gitwrap.gitwrap.get_repo")
@@ -36,9 +37,9 @@ class TestGitWrap(unittest.TestCase):
         mock_get_repo.return_value = self.init_repo()
 
         result = gitwrap.clean()
-        mock_echo.assert_called_with("No untracked files found.")
+        mock_echo.assert_called_with(ResponseMessage.NO_UNTRACKED_FILES.value)
         self.assertEqual(result.status, gitwrap.gitwrap.GitWrapStatus.NO_ACTION)
-        self.assertIn("No untracked files found", result.status_message)
+        self.assertEqual(ResponseMessage.NO_UNTRACKED_FILES.value, result.status_message)
     
     @patch("gitwrap.gitwrap.get_untracked_files", return_value=["untracked.txt"])
     @patch("gitwrap.gitwrap.get_repo")
@@ -75,7 +76,7 @@ class TestGitWrap(unittest.TestCase):
         })
         expected_response = gitwrap.gitwrap.GitWrapResponse(
             status = gitwrap.gitwrap.GitWrapStatus.SUCCESS,
-            status_message = "Clean operation completed successfully.",
+            status_message = ResponseMessage.SUCCESS.value,
             dry_run = False,
             action = "clean",
             yaml_output = expected_yaml
@@ -93,7 +94,7 @@ class TestGitWrap(unittest.TestCase):
         mock_get_repo.return_value = self.init_repo(untracked=True)
         expected_response = gitwrap.gitwrap.GitWrapResponse(
             status = gitwrap.gitwrap.GitWrapStatus.NO_ACTION,
-            status_message = "Operation cancelled by user.",
+            status_message = ResponseMessage.OPERATION_CANCELLED.value,
             dry_run = False,
             action = "clean",
             yaml_output = ""
@@ -114,7 +115,7 @@ class TestGitWrap(unittest.TestCase):
         })
         expected_response = gitwrap.gitwrap.GitWrapResponse(
             status = gitwrap.gitwrap.GitWrapStatus.SUCCESS,
-            status_message = "Clean operation completed successfully.",
+            status_message = ResponseMessage.SUCCESS.value,
             dry_run = False,
             action = "clean",
             yaml_output = expected_yaml
@@ -146,11 +147,11 @@ class TestGitWrap(unittest.TestCase):
     @patch("gitwrap.gitwrap.typer.echo")
     def test_status_no_repo(self, mock_echo, mock_get_repo):
         result = gitwrap.status()
-        mock_echo.assert_called_with("No git repository found.")
+        mock_echo.assert_called_with(ResponseMessage.NO_REPO.value)
         self.assertEqual(result.status, gitwrap.gitwrap.GitWrapStatus.FAILURE)
-        self.assertIn("No git repository found", result.status_message)
+        self.assertIn(ResponseMessage.NO_REPO.value, result.status_message)
     
-    @patch("gitwrap.gitwrap.git_status", return_value=MagicMock(success=True, message="Status operation completed successfully.", staged_files=[], unstaged_files=[], untracked_files=[]))
+    @patch("gitwrap.gitwrap.git_status", return_value=MagicMock(success=True, message=ResponseMessage.SUCCESS.value, staged_files=[], unstaged_files=[], untracked_files=[]))
     @patch("gitwrap.gitwrap.get_repo")
     @patch("gitwrap.gitwrap.typer.echo")
     def test_status_no_changes(self, mock_echo, mock_get_repo, mock_git_status):
@@ -161,7 +162,7 @@ class TestGitWrap(unittest.TestCase):
         })
         expected_response = gitwrap.gitwrap.GitWrapResponse(
             status = gitwrap.gitwrap.GitWrapStatus.SUCCESS,
-            status_message = "Status operation completed successfully.",
+            status_message = ResponseMessage.SUCCESS.value,
             dry_run = False,
             action = "status",
             yaml_output = expected_yaml
@@ -171,7 +172,7 @@ class TestGitWrap(unittest.TestCase):
         mock_echo.assert_called_with(expected_yaml)
         self.assertEqual(expected_response, result)
     
-    @patch("gitwrap.gitwrap.git_status", return_value=MagicMock(success=True, message="Status operation completed successfully.", staged_files=["staged.txt"], unstaged_files=["unstaged.txt"], untracked_files=["untracked.txt"]))
+    @patch("gitwrap.gitwrap.git_status", return_value=MagicMock(success=True, message=ResponseMessage.SUCCESS.value, staged_files=["staged.txt"], unstaged_files=["unstaged.txt"], untracked_files=["untracked.txt"]))
     @patch("gitwrap.gitwrap.get_repo")
     @patch("gitwrap.gitwrap.typer.echo")
     def test_status_with_all_files(self, mock_echo, mock_get_repo, mock_git_status):
@@ -185,7 +186,7 @@ class TestGitWrap(unittest.TestCase):
         })
         expected_response = gitwrap.gitwrap.GitWrapResponse(
             status = gitwrap.gitwrap.GitWrapStatus.SUCCESS,
-            status_message = "Status operation completed successfully.",
+            status_message = ResponseMessage.SUCCESS.value,
             dry_run = False,
             action = "status",
             yaml_output = expected_yaml

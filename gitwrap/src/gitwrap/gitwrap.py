@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import git
 import typer
-from .models import GitWrapResponse, GitWrapStatus
+from .models import GitWrapResponse, GitWrapStatus, ResponseMessage
 from .git_utils import get_repo, get_untracked_files, git_clean, git_status
 from .yaml_utils import yaml_dump
 
@@ -14,29 +14,30 @@ def clean(dry_run: bool=False, yes: bool=False):
 
     repo = get_repo()
     if not repo:
-        response.status_message = "No git repository found."
+        response.status_message = ResponseMessage.NO_REPO.value
         response.status = GitWrapStatus.FAILURE
         typer.echo(response.status_message)
         return response
 
     untracked_files = get_untracked_files(repo)
     if not untracked_files:
-        response.status_message = "No untracked files found."
+        response.status_message = ResponseMessage.NO_UNTRACKED_FILES.value
         typer.echo(response.status_message)
         return response
 
     if not dry_run:
         if not yes and not typer.confirm(f"This will delete {len(untracked_files)} untracked files. Continue? [y/N]:"):
-            response.status_message = "Operation cancelled by user."
+            response.status_message = ResponseMessage.OPERATION_CANCELLED.value
             return response
 
         clean_result = git_clean(repo)
-        response.status_message = clean_result.message
         if not clean_result.success:
+            response.status_message = clean_result.message
             typer.echo(response.status_message)
             response.status = GitWrapStatus.FAILURE
             return response
         response.status = GitWrapStatus.SUCCESS
+        response.status_message = ResponseMessage.SUCCESS.value
     
     yaml_output = {
         "dry_run": dry_run,
@@ -55,7 +56,7 @@ def status(dry_run: bool=False):
 
     repo = get_repo()
     if not repo:
-        response.status_message = "No git repository found."
+        response.status_message = ResponseMessage.NO_REPO.value
         response.status = GitWrapStatus.FAILURE
         typer.echo(response.status_message)
         return response
@@ -80,7 +81,7 @@ def status(dry_run: bool=False):
     
     response.status = GitWrapStatus.SUCCESS
     response.yaml_output = yaml_dump(yaml_output)
-    response.status_message = "Status operation completed successfully."
+    response.status_message = ResponseMessage.SUCCESS.value
     typer.echo(response.yaml_output)
     return response
 
