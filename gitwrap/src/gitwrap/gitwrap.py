@@ -5,10 +5,10 @@ from .models import GitWrapResponse, GitWrapStatus
 from .git_utils import get_repo, get_untracked_files, git_clean, git_status
 from .yaml_utils import yaml_dump
 
-app = typer.Typer(help = "CLI tool to manage git repositories with YAML output.")
+app = typer.Typer(help="CLI tool to manage git repositories with YAML output.")
 
 @app.command()
-def clean(dry_run: bool = False, yes: bool = False):
+def clean(dry_run: bool=False, yes: bool=False):
     """Clean up the repository by removing untracked files."""
     response = GitWrapResponse(status=GitWrapStatus.NO_ACTION, status_message= "", dry_run=dry_run, action="clean", yaml_output="")
 
@@ -49,7 +49,7 @@ def clean(dry_run: bool = False, yes: bool = False):
     return response
 
 @app.command()
-def status(dry_run: bool = False):
+def status(dry_run: bool=False):
     """Show the status of the repository in YAML format."""
     response = GitWrapResponse(status=GitWrapStatus.NO_ACTION, status_message="", dry_run=dry_run, action="status", yaml_output="")
 

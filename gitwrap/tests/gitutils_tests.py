@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 
 class TestGitUtils(unittest.TestCase):
-    def init_repo(self, staged = False, unstaged = False, untracked = False):
+    def init_repo(self, staged=False, unstaged=False, untracked=False):
         repo = MagicMock(active_branch = MagicMock())
         repo.active_branch.name = "main"
         if staged:
@@ -34,22 +34,22 @@ class TestGitUtils(unittest.TestCase):
         self.assertEqual(repo, mock_repo)
 
     def test_get_untracked_files(self):
-        mock_repo = self.init_repo(untracked = True)
+        mock_repo = self.init_repo(untracked=True)
 
         untracked_files = git_utils.get_untracked_files(mock_repo)
         self.assertEqual(untracked_files, ["untracked.txt"])
 
     def test_git_clean_success(self):
-        mock_repo = self.init_repo(untracked = True)
-        mock_repo.git.clean = MagicMock(return_value = None)
+        mock_repo = self.init_repo(untracked=True)
+        mock_repo.git.clean = MagicMock(return_value=None)
         
         result = git_utils.git_clean(mock_repo)
         self.assertTrue(result.success)
         self.assertEqual(result.message, "Clean operation completed successfully.")
     
     def test_git_clean_failure(self):
-        mock_repo = self.init_repo(untracked = True)
-        mock_repo.git.clean = MagicMock(side_effect = Exception("Clean failed"))
+        mock_repo = self.init_repo(untracked=True)
+        mock_repo.git.clean = MagicMock(side_effect=Exception("Clean failed"))
 
         result = git_utils.git_clean(mock_repo)
         self.assertFalse(result.success)

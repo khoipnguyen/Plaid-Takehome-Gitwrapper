@@ -16,14 +16,14 @@ def get_untracked_files(repo: git.Repo):
 
 def git_clean(repo: git.Repo):
     try:
-        repo.git.clean(f = True, d = True)
-        return GitCleanResult(success = True, message = "Clean operation completed successfully.")
+        repo.git.clean(f=True, d=True)
+        return GitCleanResult(success=True, message="Clean operation completed successfully.")
     except Exception as e:
-        return GitCleanResult(success = False, message = f"Failed to clean untracked files: {e}.")
+        return GitCleanResult(success=False, message=f"Failed to clean untracked files: {e}.")
 
 def git_status(repo: git.Repo):
     """Get the status of the repository."""
-    result = GitStatusResult(success = False, message = "", staged_files = [], unstaged_files = [], untracked_files = [])
+    result = GitStatusResult(success=False, message="", staged_files=[], unstaged_files=[], untracked_files=[])
     
     try:
         status = repo.git.status('--porcelain=v1', '--untracked-files=all').splitlines()
