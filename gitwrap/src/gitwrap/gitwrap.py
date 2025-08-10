@@ -26,7 +26,7 @@ def clean(dry_run: bool=False, yes: bool=False):
         return response
 
     if not dry_run:
-        if not yes and not typer.confirm(f"This will delete {len(untracked_files)} untracked files. Continue? [y/N]:"):
+        if not yes and not typer.confirm(f"This will delete {len(untracked_files)} untracked files. Continue?"):
             response.status_message = ResponseMessage.OPERATION_CANCELLED.value
             return response
 
