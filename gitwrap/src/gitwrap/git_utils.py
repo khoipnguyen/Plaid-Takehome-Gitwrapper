@@ -27,7 +27,7 @@ def git_status(repo: git.Repo):
     
     try:
         status = repo.git.status('--porcelain=v1', '--untracked-files=all').splitlines()
-    except git.exc.GitCommandError as e:
+    except Exception as e:
         result.message = f"Failed to retrieve status: {e}."
         return result
 

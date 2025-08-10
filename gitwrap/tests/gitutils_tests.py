@@ -56,7 +56,12 @@ class TestGitUtils(unittest.TestCase):
         self.assertEqual(result.message, "Failed to clean untracked files: Clean failed.")
     
     def test_git_status_success(self):
-        mock_repo = self.init_repo(staged = True, unstaged = True, untracked = True)
+        mock_repo = MagicMock()
+        mock_repo.git.status.return_value = (
+            "M  staged.txt\n"  
+            " M unstaged.txt\n" 
+            "?? untracked.txt\n"
+        )
 
         result = git_utils.git_status(mock_repo)
         self.assertTrue(result.success)
@@ -76,8 +81,8 @@ class TestGitUtils(unittest.TestCase):
         self.assertEqual(result.untracked_files, [])
     
     def test_git_status_failure(self):
-        mock_repo = self.init_repo()
-        mock_repo.index.diff = MagicMock(side_effect = Exception("Status failed"))
+        mock_repo = MagicMock()
+        mock_repo.git.status.side_effect = Exception("Status failed")
 
         result = git_utils.git_status(mock_repo)
         self.assertFalse(result.success)
